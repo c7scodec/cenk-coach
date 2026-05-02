@@ -1,0 +1,1847 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="CenkFit">
+<meta name="theme-color" content="#0a0a0a">
+<title>CenkFit Coach</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #080808;
+  --s1: #111;
+  --s2: #181818;
+  --s3: #202020;
+  --border: #2a2a2a;
+  --border2: #333;
+  --accent: #c8ff00;
+  --accent-dim: rgba(200,255,0,0.12);
+  --accent2: #ff5c35;
+  --accent3: #35c8ff;
+  --purple: #b06fff;
+  --text: #f2f2f2;
+  --muted: #555;
+  --muted2: #888;
+  --danger: #ff3b3b;
+  --success: #00e87a;
+  --warn: #ffb800;
+  --nav-h: 64px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+/* ── SCREENS ── */
+#app { height: 100dvh; display: flex; flex-direction: column; }
+
+.screen {
+  display: none;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0 0 calc(var(--nav-h) + var(--safe-bottom) + 16px);
+  -webkit-overflow-scrolling: touch;
+}
+.screen.active { display: block; }
+
+/* ── HEADER ── */
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px 12px;
+  position: sticky;
+  top: 0;
+  background: var(--bg);
+  z-index: 10;
+  border-bottom: 1px solid var(--border);
+}
+
+.top-bar h2 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  letter-spacing: 2px;
+  color: var(--text);
+}
+
+.top-bar .date-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--muted2);
+  letter-spacing: 1px;
+}
+
+/* ── BOTTOM NAV ── */
+.bottom-nav {
+  display: flex;
+  position: fixed;
+  bottom: 0;
+  left: 0; right: 0;
+  height: calc(var(--nav-h) + var(--safe-bottom));
+  padding-bottom: var(--safe-bottom);
+  background: rgba(8,8,8,0.95);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border);
+  z-index: 100;
+}
+
+.nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  padding: 8px 0;
+}
+
+.nav-item.active { color: var(--accent); }
+.nav-item .nav-icon { font-size: 22px; transition: transform 0.2s; }
+.nav-item.active .nav-icon { transform: scale(1.15); }
+.nav-item .nav-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* ── CARDS ── */
+.card {
+  background: var(--s1);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px 18px;
+  margin: 0 16px 12px;
+}
+
+.card-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--muted2);
+  margin-bottom: 12px;
+}
+
+/* ── HOME SCREEN ── */
+.hero-banner {
+  margin: 16px 16px 12px;
+  background: linear-gradient(135deg, #0f1a00 0%, #0a0a0a 60%);
+  border: 1px solid rgba(200,255,0,0.2);
+  border-radius: 16px;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-banner::before {
+  content: '';
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 160px; height: 160px;
+  background: radial-gradient(circle, rgba(200,255,0,0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.hero-greeting {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 13px;
+  letter-spacing: 3px;
+  color: var(--muted2);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.hero-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 36px;
+  letter-spacing: 1px;
+  line-height: 1;
+  color: var(--text);
+  margin-bottom: 16px;
+}
+
+.hero-name span { color: var(--accent); }
+
+.hero-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.hero-stat .hs-val {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px;
+  line-height: 1;
+  color: var(--accent);
+}
+
+.hero-stat .hs-lbl {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  color: var(--muted2);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+/* ── TODAY RINGS ── */
+.rings-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin: 0 16px 12px;
+}
+
+.ring-card {
+  background: var(--s1);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 8px;
+  text-align: center;
+}
+
+.ring-wrap {
+  position: relative;
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 6px;
+}
+
+.ring-wrap svg {
+  width: 52px;
+  height: 52px;
+  transform: rotate(-90deg);
+}
+
+.ring-wrap .ring-bg { fill: none; stroke: var(--s3); stroke-width: 4; }
+.ring-wrap .ring-fg { fill: none; stroke-width: 4; stroke-linecap: round; transition: stroke-dashoffset 0.8s ease; }
+
+.ring-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 13px;
+  line-height: 1;
+}
+
+.ring-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 1px;
+  color: var(--muted2);
+  text-transform: uppercase;
+}
+
+/* ── MACRO BAR ── */
+.macro-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.macro-row .ml { font-size: 12px; color: var(--muted2); }
+.macro-row .mv { font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+
+.bar-track {
+  height: 5px;
+  background: var(--s3);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.6s ease;
+}
+
+/* ── QUICK LOG ── */
+.quick-btns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 0 16px 12px;
+}
+
+.qbtn {
+  background: var(--s1);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text);
+}
+
+.qbtn:active { transform: scale(0.97); background: var(--s2); }
+.qbtn .qb-icon { font-size: 24px; }
+.qbtn .qb-text { font-size: 13px; font-weight: 500; }
+.qbtn .qb-sub { font-size: 11px; color: var(--muted2); margin-top: 1px; }
+
+/* ── ÖĞÜN SCREEN ── */
+.meal-tabs {
+  display: flex;
+  gap: 6px;
+  padding: 12px 16px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.meal-tabs::-webkit-scrollbar { display: none; }
+
+.mtab {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 7px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted2);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+.mtab.active { background: var(--accent); color: #000; border-color: var(--accent); font-weight: 700; }
+
+.meal-section { display: none; }
+.meal-section.active { display: block; }
+
+/* food log item */
+.food-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.food-item:last-child { border-bottom: none; }
+.fi-name { font-size: 13px; font-weight: 500; }
+.fi-detail { font-size: 11px; color: var(--muted2); margin-top: 2px; }
+.fi-kcal { font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: var(--accent); }
+.fi-del { background: none; border: none; color: var(--muted); font-size: 18px; cursor: pointer; padding: 4px; }
+
+/* add food form */
+.add-food-form {
+  background: var(--s2);
+  border-radius: 12px;
+  padding: 14px;
+  margin-top: 10px;
+}
+
+/* ── INPUTS ── */
+.inp-group { margin-bottom: 12px; }
+.inp-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted2);
+  margin-bottom: 6px;
+  display: block;
+}
+
+.inp {
+  width: 100%;
+  background: var(--s3);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+  -webkit-appearance: none;
+}
+.inp:focus { border-color: var(--accent); }
+.inp::placeholder { color: var(--muted); }
+
+.inp-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.inp-row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+
+.btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn:active { transform: scale(0.98); }
+.btn-primary { background: var(--accent); color: #000; }
+.btn-secondary { background: var(--s3); color: var(--text); border: 1px solid var(--border2); }
+.btn-danger { background: rgba(255,59,59,0.15); color: var(--danger); border: 1px solid rgba(255,59,59,0.3); }
+
+/* ── ANTRENMAN ── */
+.workout-day-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  margin: 0 16px 16px;
+}
+
+.wday {
+  aspect-ratio: 1;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--s1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.wday.today { border-color: var(--accent); }
+.wday.done { background: rgba(200,255,0,0.1); border-color: rgba(200,255,0,0.3); }
+.wday .wd-name { font-family:'JetBrains Mono',monospace; font-size: 8px; color: var(--muted2); letter-spacing: 1px; }
+.wday .wd-num { font-family:'Bebas Neue',sans-serif; font-size: 18px; color: var(--text); line-height:1; }
+.wday .wd-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); display: none; }
+.wday.done .wd-dot { display: block; }
+
+/* exercise list */
+.ex-item {
+  background: var(--s2);
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 8px;
+}
+.ex-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.ex-item-name { font-size: 14px; font-weight: 600; }
+.ex-sets { display: flex; gap: 6px; flex-wrap: wrap; }
+.set-chip {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: var(--s3);
+  color: var(--muted2);
+  border: 1px solid var(--border);
+}
+.set-chip.done { background: var(--accent-dim); color: var(--accent); border-color: rgba(200,255,0,0.3); }
+
+/* ── KİLO SCREEN ── */
+.weight-big {
+  text-align: center;
+  padding: 24px 16px 16px;
+}
+.wb-current { font-family: 'Bebas Neue', sans-serif; font-size: 80px; line-height: 1; color: var(--accent); }
+.wb-unit { font-family: 'JetBrains Mono', monospace; font-size: 14px; color: var(--muted2); letter-spacing: 2px; }
+.wb-change { font-size: 13px; margin-top: 6px; }
+
+/* chart */
+.chart-wrap {
+  height: 180px;
+  position: relative;
+  margin: 0 16px 12px;
+  background: var(--s1);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  padding: 16px;
+}
+
+canvas { width: 100% !important; }
+
+/* progress bar milestones */
+.milestone-track {
+  height: 8px;
+  background: var(--s3);
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 8px 0 6px;
+  position: relative;
+}
+.milestone-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent2), var(--accent));
+  border-radius: 4px;
+  transition: width 1s ease;
+}
+
+/* ── TAKVİYE ── */
+.supp-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+}
+.supp-item:last-child { border-bottom: none; }
+.supp-icon { font-size: 28px; width: 36px; text-align: center; }
+.supp-info { flex: 1; }
+.supp-name { font-size: 14px; font-weight: 500; }
+.supp-dose { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted2); margin-top: 2px; }
+.supp-check {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  border: 2px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.supp-check.done { background: var(--accent); border-color: var(--accent); color: #000; }
+
+/* ── ÖLÇÜM SCREEN ── */
+.body-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 0 16px 12px;
+}
+
+.body-metric {
+  background: var(--s1);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+}
+.bm-label { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 2px; color: var(--muted2); text-transform: uppercase; margin-bottom: 6px; }
+.bm-val { font-family: 'Bebas Neue', sans-serif; font-size: 32px; line-height: 1; }
+.bm-val.bad { color: var(--danger); }
+.bm-val.warn { color: var(--warn); }
+.bm-val.ok { color: var(--success); }
+.bm-prev { font-size: 11px; color: var(--muted2); margin-top: 3px; }
+
+/* ── MODAL ── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 200;
+  display: none;
+  align-items: flex-end;
+  backdrop-filter: blur(4px);
+}
+.modal-overlay.open { display: flex; }
+
+.modal-sheet {
+  width: 100%;
+  background: var(--s1);
+  border-radius: 20px 20px 0 0;
+  padding: 16px 20px calc(20px + var(--safe-bottom));
+  animation: slideUp 0.3s ease;
+  max-height: 90dvh;
+  overflow-y: auto;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.modal-handle {
+  width: 40px; height: 4px;
+  background: var(--border2);
+  border-radius: 2px;
+  margin: 0 auto 16px;
+}
+
+.modal-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  letter-spacing: 1px;
+  margin-bottom: 16px;
+}
+
+/* ── TOAST ── */
+.toast {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-80px);
+  background: var(--accent);
+  color: #000;
+  font-weight: 600;
+  font-size: 13px;
+  padding: 10px 20px;
+  border-radius: 20px;
+  z-index: 300;
+  transition: transform 0.3s ease;
+  white-space: nowrap;
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+/* ── STREAK ── */
+.streak-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  margin: 0 16px 12px;
+}
+
+.streak-item {
+  flex: 1;
+  background: var(--s1);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  text-align: center;
+}
+.streak-item .sv { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: var(--accent); line-height:1; }
+.streak-item .sl { font-family: 'JetBrains Mono', monospace; font-size: 8px; color: var(--muted2); letter-spacing: 1px; text-transform: uppercase; margin-top: 2px; }
+
+/* ── SECTION DIVIDER ── */
+.sec-div {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 8px 16px 6px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.sec-div::after { content:''; flex:1; height:1px; background:var(--border); }
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 0; }
+
+/* ── ADIM ── */
+.step-display {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin: 8px 0 4px;
+}
+.step-num { font-family: 'Bebas Neue', sans-serif; font-size: 48px; line-height:1; color: var(--accent3); }
+.step-unit { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--muted2); }
+
+.step-bar { height: 6px; background: var(--s3); border-radius: 3px; overflow: hidden; margin-bottom: 6px; }
+.step-bar-fill { height: 100%; background: var(--accent3); border-radius: 3px; transition: width 0.8s ease; }
+
+/* ── FAZ BADGE ── */
+.faz-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+.faz-0 { background: rgba(85,85,85,0.2); color: var(--muted2); border: 1px solid var(--border); }
+.faz-1 { background: rgba(255,92,53,0.15); color: var(--accent2); border: 1px solid rgba(255,92,53,0.3); }
+.faz-2 { background: rgba(200,255,0,0.1); color: var(--accent); border: 1px solid rgba(200,255,0,0.3); }
+.faz-3 { background: rgba(0,232,122,0.1); color: var(--success); border: 1px solid rgba(0,232,122,0.3); }
+
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ══════════════════════════════
+       ANA EKRAN
+  ══════════════════════════════ -->
+  <div id="screen-home" class="screen active">
+    <div class="top-bar">
+      <div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--muted2);text-transform:uppercase" id="todayLabel">Bugün</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px">ÖZET</div>
+      </div>
+      <div id="fazBadgeHome" class="faz-badge faz-0">FAZ 0</div>
+    </div>
+
+    <!-- Hero -->
+    <div class="hero-banner">
+      <div class="hero-greeting">Hoş geldin</div>
+      <div class="hero-name">CENK <span>FİT</span></div>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <div class="hs-val" id="homeCurrentWeight">115</div>
+          <div class="hs-lbl">Mevcut kg</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hs-val" id="homeKgLeft">40</div>
+          <div class="hs-lbl">Kalan kg</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hs-val" id="homeWeekNum">1</div>
+          <div class="hs-lbl">Hafta</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rings -->
+    <div class="sec-div">Bugünün Hedefleri</div>
+    <div class="rings-row">
+      <div class="ring-card">
+        <div class="ring-wrap">
+          <svg viewBox="0 0 52 52"><circle class="ring-bg" cx="26" cy="26" r="22"/><circle class="ring-fg" id="ringKcal" cx="26" cy="26" r="22" stroke="var(--accent)" stroke-dasharray="138.2" stroke-dashoffset="138.2"/></svg>
+          <div class="ring-center" id="ringKcalPct" style="color:var(--accent)">0%</div>
+        </div>
+        <div class="ring-label">Kalori</div>
+      </div>
+      <div class="ring-card">
+        <div class="ring-wrap">
+          <svg viewBox="0 0 52 52"><circle class="ring-bg" cx="26" cy="26" r="22"/><circle class="ring-fg" id="ringProtein" cx="26" cy="26" r="22" stroke="var(--accent2)" stroke-dasharray="138.2" stroke-dashoffset="138.2"/></svg>
+          <div class="ring-center" id="ringProteinPct" style="color:var(--accent2)">0%</div>
+        </div>
+        <div class="ring-label">Protein</div>
+      </div>
+      <div class="ring-card">
+        <div class="ring-wrap">
+          <svg viewBox="0 0 52 52"><circle class="ring-bg" cx="26" cy="26" r="22"/><circle class="ring-fg" id="ringSteps" cx="26" cy="26" r="22" stroke="var(--accent3)" stroke-dasharray="138.2" stroke-dashoffset="138.2"/></svg>
+          <div class="ring-center" id="ringStepsPct" style="color:var(--accent3)">0%</div>
+        </div>
+        <div class="ring-label">Adım</div>
+      </div>
+      <div class="ring-card">
+        <div class="ring-wrap">
+          <svg viewBox="0 0 52 52"><circle class="ring-bg" cx="26" cy="26" r="22"/><circle class="ring-fg" id="ringSuppRing" cx="26" cy="26" r="22" stroke="var(--purple)" stroke-dasharray="138.2" stroke-dashoffset="138.2"/></svg>
+          <div class="ring-center" id="ringSuppPct" style="color:var(--purple)">0%</div>
+        </div>
+        <div class="ring-label">Takviye</div>
+      </div>
+    </div>
+
+    <!-- Kalori özet -->
+    <div class="card">
+      <div class="card-title">Kalori Takibi</div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:10px">
+        <div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:40px;line-height:1;color:var(--accent)" id="homeTotalKcal">0</div>
+          <div style="font-size:11px;color:var(--muted2)">/ 1980 kcal</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:12px;color:var(--muted2)">Kalan</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--text)" id="homeRemainingKcal">1980</div>
+        </div>
+      </div>
+      <div class="bar-track"><div class="bar-fill" id="homeKcalBar" style="width:0%;background:var(--accent)"></div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:4px">
+        <div>
+          <div class="macro-row"><span class="ml">Protein</span><span class="mv" id="hmProtein" style="color:var(--accent2)">0g</span></div>
+          <div class="bar-track"><div class="bar-fill" id="hmProteinBar" style="width:0%;background:var(--accent2)"></div></div>
+        </div>
+        <div>
+          <div class="macro-row"><span class="ml">Karb</span><span class="mv" id="hmCarb" style="color:var(--accent3)">0g</span></div>
+          <div class="bar-track"><div class="bar-fill" id="hmCarbBar" style="width:0%;background:var(--accent3)"></div></div>
+        </div>
+        <div>
+          <div class="macro-row"><span class="ml">Yağ</span><span class="mv" id="hmFat" style="color:var(--purple)">0g</span></div>
+          <div class="bar-track"><div class="bar-fill" id="hmFatBar" style="width:0%;background:var(--purple)"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Adım -->
+    <div class="card">
+      <div class="card-title">Günlük Adım</div>
+      <div class="step-display">
+        <div class="step-num" id="homeSteps">0</div>
+        <div class="step-unit">/ 10.000 adım</div>
+      </div>
+      <div class="step-bar"><div class="step-bar-fill" id="homeStepBar" style="width:0%"></div></div>
+      <button class="btn btn-secondary" style="margin-top:8px" onclick="openStepModal()">Adım Güncelle</button>
+    </div>
+
+    <!-- Streak -->
+    <div class="sec-div">Seri</div>
+    <div class="streak-row">
+      <div class="streak-item"><div class="sv" id="streakDiet">0</div><div class="sl">Diyet Günü</div></div>
+      <div class="streak-item"><div class="sv" id="streakWorkout">0</div><div class="sl">Antrenman</div></div>
+      <div class="streak-item"><div class="sv" id="streakSupp">0</div><div class="sl">Takviye</div></div>
+    </div>
+
+    <!-- Hedef ilerleme -->
+    <div class="card">
+      <div class="card-title">Hedef İlerlemesi — 115 → 75 kg</div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted2);margin-bottom:6px">
+        <span>115 kg</span>
+        <span id="progressPct" style="color:var(--accent);font-weight:600">0%</span>
+        <span>75 kg</span>
+      </div>
+      <div class="milestone-track"><div class="milestone-fill" id="goalBar" style="width:0%"></div></div>
+      <div style="font-size:12px;color:var(--muted2);margin-top:6px">Verilen: <span id="totalLost" style="color:var(--success);font-weight:600">0 kg</span> · Kalan: <span id="totalLeft" style="color:var(--warn);font-weight:600">40 kg</span></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       ÖĞÜN EKRANI
+  ══════════════════════════════ -->
+  <div id="screen-ogun" class="screen">
+    <div class="top-bar">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px">ÖĞÜN TAKİBİ</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent)" id="ogunDayKcal">0 / 1980</div>
+    </div>
+
+    <div class="meal-tabs">
+      <button class="mtab active" onclick="switchMeal('sabah',this)">☀️ Sabah</button>
+      <button class="mtab" onclick="switchMeal('ogle',this)">🌤 Öğle</button>
+      <button class="mtab" onclick="switchMeal('ara',this)">🍎 Ara</button>
+      <button class="mtab" onclick="switchMeal('aksam',this)">🌙 Akşam</button>
+      <button class="mtab" onclick="switchMeal('gece',this)">💤 Gece</button>
+    </div>
+
+    <!-- Her öğün için section -->
+    <div id="meal-sabah" class="meal-section active">
+      <div class="card">
+        <div class="card-title">Sabah Öğünü</div>
+        <div id="list-sabah"></div>
+        <button class="btn btn-secondary" style="margin-top:10px" onclick="openAddFood('sabah')">+ Yiyecek Ekle</button>
+      </div>
+    </div>
+    <div id="meal-ogle" class="meal-section">
+      <div class="card">
+        <div class="card-title">Öğle Öğünü</div>
+        <div id="list-ogle"></div>
+        <button class="btn btn-secondary" style="margin-top:10px" onclick="openAddFood('ogle')">+ Yiyecek Ekle</button>
+      </div>
+    </div>
+    <div id="meal-ara" class="meal-section">
+      <div class="card">
+        <div class="card-title">Ara Öğün</div>
+        <div id="list-ara"></div>
+        <button class="btn btn-secondary" style="margin-top:10px" onclick="openAddFood('ara')">+ Yiyecek Ekle</button>
+      </div>
+    </div>
+    <div id="meal-aksam" class="meal-section">
+      <div class="card">
+        <div class="card-title">Akşam Öğünü</div>
+        <div id="list-aksam"></div>
+        <button class="btn btn-secondary" style="margin-top:10px" onclick="openAddFood('aksam')">+ Yiyecek Ekle</button>
+      </div>
+    </div>
+    <div id="meal-gece" class="meal-section">
+      <div class="card">
+        <div class="card-title">Gece Öğünü</div>
+        <div id="list-gece"></div>
+        <button class="btn btn-secondary" style="margin-top:10px" onclick="openAddFood('gece')">+ Yiyecek Ekle</button>
+      </div>
+    </div>
+
+    <!-- Günlük özet -->
+    <div class="card" style="margin-top:4px">
+      <div class="card-title">Günlük Toplam</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center">
+        <div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--accent)" id="sumKcal">0</div>
+          <div style="font-size:10px;color:var(--muted2)">kcal</div>
+        </div>
+        <div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--accent2)" id="sumProtein">0</div>
+          <div style="font-size:10px;color:var(--muted2)">protein g</div>
+        </div>
+        <div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--accent3)" id="sumCarb">0</div>
+          <div style="font-size:10px;color:var(--muted2)">karb g</div>
+        </div>
+        <div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--purple)" id="sumFat">0</div>
+          <div style="font-size:10px;color:var(--muted2)">yağ g</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       ANTRENMAN EKRANI
+  ══════════════════════════════ -->
+  <div id="screen-antrenman" class="screen">
+    <div class="top-bar">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px">ANTRENMAN</div>
+      <button class="btn btn-primary" style="width:auto;padding:7px 16px;font-size:12px" onclick="openWorkoutModal()">+ Ekle</button>
+    </div>
+
+    <div class="sec-div">Bu Hafta</div>
+    <div class="workout-day-grid" id="weekDayGrid"></div>
+
+    <div class="sec-div">Bugünün Antrenmanı</div>
+    <div style="padding:0 16px" id="todayWorkoutList">
+      <div style="text-align:center;padding:24px;color:var(--muted2);font-size:13px">Henüz antrenman kaydı yok</div>
+    </div>
+
+    <div class="sec-div">Yürüyüş & Adım</div>
+    <div class="card">
+      <div class="card-title">Yürüyüş Kaydı</div>
+      <div style="display:flex;gap:10px;margin-bottom:10px">
+        <div style="flex:1">
+          <div style="font-size:11px;color:var(--muted2);margin-bottom:4px">Süre (dk)</div>
+          <input class="inp" type="number" id="walkDuration" placeholder="45">
+        </div>
+        <div style="flex:1">
+          <div style="font-size:11px;color:var(--muted2);margin-bottom:4px">Mesafe (km)</div>
+          <input class="inp" type="number" id="walkDistance" placeholder="3.5" step="0.1">
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="saveWalk()">Yürüyüşü Kaydet</button>
+    </div>
+
+    <div class="sec-div">Son Kayıtlar</div>
+    <div style="padding:0 16px" id="recentWorkouts">
+      <div style="text-align:center;padding:16px;color:var(--muted2);font-size:13px">Kayıt yok</div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       KİLO & ÖLÇÜM EKRANI
+  ══════════════════════════════ -->
+  <div id="screen-kilo" class="screen">
+    <div class="top-bar">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px">KİLO & ÖLÇÜM</div>
+      <button class="btn btn-primary" style="width:auto;padding:7px 16px;font-size:12px" onclick="openWeightModal()">+ Tartım</button>
+    </div>
+
+    <div class="weight-big">
+      <div class="wb-current" id="currentWeightDisplay">115.0</div>
+      <div class="wb-unit">KG</div>
+      <div class="wb-change" id="weightChange" style="color:var(--muted2)">Başlangıç ağırlığı</div>
+    </div>
+
+    <div class="card" style="margin-top:0">
+      <div class="card-title">İlerleme Grafiği</div>
+      <canvas id="weightChart" height="140"></canvas>
+    </div>
+
+    <div class="sec-div">Vücut Ölçümleri (Tanita)</div>
+    <div class="body-grid">
+      <div class="body-metric">
+        <div class="bm-label">Yağ Oranı %</div>
+        <div class="bm-val bad" id="bmFatPct">31.0</div>
+        <div class="bm-prev">Hedef: &lt;%20</div>
+      </div>
+      <div class="body-metric">
+        <div class="bm-label">Kas Kütlesi</div>
+        <div class="bm-val warn" id="bmMuscle">69.0 kg</div>
+        <div class="bm-prev">Hedef: &gt;72 kg</div>
+      </div>
+      <div class="body-metric">
+        <div class="bm-label">BMI</div>
+        <div class="bm-val bad" id="bmBmi">33.9</div>
+        <div class="bm-prev">Normal: 20-25</div>
+      </div>
+      <div class="body-metric">
+        <div class="bm-label">Metabolik Yaş</div>
+        <div class="bm-val bad" id="bmMetAge">40</div>
+        <div class="bm-prev">Hedef: &lt;32</div>
+      </div>
+      <div class="body-metric">
+        <div class="bm-label">Yağ Kütlesi</div>
+        <div class="bm-val bad" id="bmFatMass">32.6 kg</div>
+        <div class="bm-prev">Hedef: &lt;15 kg</div>
+      </div>
+      <div class="body-metric">
+        <div class="bm-label">Protein %</div>
+        <div class="bm-val warn" id="bmProteinPct">14.9%</div>
+        <div class="bm-prev">Normal: 16-18%</div>
+      </div>
+    </div>
+    <div style="padding:0 16px;margin-bottom:12px">
+      <button class="btn btn-secondary" onclick="openBodyModal()">Vücut Ölçümü Güncelle</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       TAKVİYE EKRANI
+  ══════════════════════════════ -->
+  <div id="screen-takviye" class="screen">
+    <div class="top-bar">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px">TAKVİYELER</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted2)" id="suppTodayCount">0/4</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Bugünkü Takviyeler</div>
+      <div id="suppList">
+        <div class="supp-item" onclick="toggleSupp('d3k2')">
+          <div class="supp-icon">☀️</div>
+          <div class="supp-info">
+            <div class="supp-name">D3 + K2</div>
+            <div class="supp-dose">2000-4000 IU · Sabah kahvaltıyla</div>
+          </div>
+          <div class="supp-check" id="supp-d3k2">✓</div>
+        </div>
+        <div class="supp-item" onclick="toggleSupp('mag')">
+          <div class="supp-icon">⚡</div>
+          <div class="supp-info">
+            <div class="supp-name">Magnezyum Glisinat</div>
+            <div class="supp-dose">300-400 mg · Gece yatmadan</div>
+          </div>
+          <div class="supp-check" id="supp-mag">✓</div>
+        </div>
+        <div class="supp-item" onclick="toggleSupp('omega')">
+          <div class="supp-icon">🐟</div>
+          <div class="supp-info">
+            <div class="supp-name">Omega-3 (EPA+DHA)</div>
+            <div class="supp-dose">1-2g · Sabah yemekle</div>
+          </div>
+          <div class="supp-check" id="supp-omega">✓</div>
+        </div>
+        <div class="supp-item" onclick="toggleSupp('zinc')">
+          <div class="supp-icon">🛡️</div>
+          <div class="supp-info">
+            <div class="supp-name">Çinko</div>
+            <div class="supp-dose">15-25 mg · Yemekten ayrı</div>
+          </div>
+          <div class="supp-check" id="supp-zinc">✓</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec-div">Takviye Geçmişi (Son 7 Gün)</div>
+    <div class="card">
+      <div id="suppHistory" style="font-size:13px;color:var(--muted2);text-align:center;padding:16px">Kayıt yok</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Kan Tahlili Hatırlatıcısı</div>
+      <div style="font-size:13px;line-height:1.7;color:var(--muted2)">
+        Aile hekiminden ücretsiz isteyebilirsin:<br>
+        <span style="color:var(--text)">D Vitamini · B12 · Demir · Ferritin · Tam Kan · TSH</span>
+      </div>
+      <div style="margin-top:10px">
+        <div style="font-size:11px;color:var(--muted2);margin-bottom:6px">Son tahlil tarihi</div>
+        <input class="inp" type="date" id="lastBloodTest">
+        <button class="btn btn-secondary" style="margin-top:8px" onclick="saveBloodTest()">Kaydet</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /app -->
+
+<!-- ══ BOTTOM NAV ══ -->
+<nav class="bottom-nav">
+  <button class="nav-item active" onclick="goScreen('home',this)">
+    <div class="nav-icon">🏠</div>
+    <div class="nav-label">Ana</div>
+  </button>
+  <button class="nav-item" onclick="goScreen('ogun',this)">
+    <div class="nav-icon">🍽</div>
+    <div class="nav-label">Öğün</div>
+  </button>
+  <button class="nav-item" onclick="goScreen('antrenman',this)">
+    <div class="nav-icon">💪</div>
+    <div class="nav-label">Antrenman</div>
+  </button>
+  <button class="nav-item" onclick="goScreen('kilo',this)">
+    <div class="nav-icon">⚖️</div>
+    <div class="nav-label">Kilo</div>
+  </button>
+  <button class="nav-item" onclick="goScreen('takviye',this)">
+    <div class="nav-icon">💊</div>
+    <div class="nav-label">Takviye</div>
+  </button>
+</nav>
+
+<!-- ══ MODALS ══ -->
+
+<!-- Add Food Modal -->
+<div class="modal-overlay" id="modalFood">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Yiyecek Ekle</div>
+    <div class="inp-group">
+      <label class="inp-label">Yiyecek Adı</label>
+      <input class="inp" id="foodName" placeholder="Örn: Haşlanmış yumurta">
+    </div>
+    <div class="inp-row" style="margin-bottom:12px">
+      <div>
+        <label class="inp-label">Kalori (kcal)</label>
+        <input class="inp" type="number" id="foodKcal" placeholder="70">
+      </div>
+      <div>
+        <label class="inp-label">Miktar / Birim</label>
+        <input class="inp" id="foodAmount" placeholder="1 adet / 100g">
+      </div>
+    </div>
+    <div class="inp-row3" style="margin-bottom:16px">
+      <div>
+        <label class="inp-label">Protein (g)</label>
+        <input class="inp" type="number" id="foodProtein" placeholder="6">
+      </div>
+      <div>
+        <label class="inp-label">Karb (g)</label>
+        <input class="inp" type="number" id="foodCarb" placeholder="0">
+      </div>
+      <div>
+        <label class="inp-label">Yağ (g)</label>
+        <input class="inp" type="number" id="foodFat" placeholder="5">
+      </div>
+    </div>
+
+    <!-- Hızlı ekle butonları -->
+    <div class="card-title" style="margin-bottom:8px">Hızlı Ekle</div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px">
+      <button class="btn btn-secondary" style="width:auto;padding:6px 12px;font-size:12px" onclick="quickFood('Haşlanmış Yumurta','1 adet',70,6,0,5)">🥚 Yumurta</button>
+      <button class="btn btn-secondary" style="width:auto;padding:6px 12px;font-size:12px" onclick="quickFood('Beyaz Peynir','30g',75,5,1,6)">🧀 Peynir</button>
+      <button class="btn btn-secondary" style="width:auto;padding:6px 12px;font-size:12px" onclick="quickFood('ON Whey','1 ölçek',120,24,3,1.5)">💪 Whey</button>
+      <button class="btn btn-secondary" style="width:auto;padding:6px 12px;font-size:12px" onclick="quickFood('Yulaf','3 kaşık',115,4,20,2)">🌾 Yulaf</button>
+      <button class="btn btn-secondary" style="width:auto;padding:6px 12px;font-size:12px" onclick="quickFood('Tavuk Göğsü','150g',165,36,0,3)">🍗 Tavuk</button>
+      <button class="btn btn-secondary" style="width:auto;padding:6px 12px;font-size:12px" onclick="quickFood('Wasa Ekmek','1 dilim',35,1,8,0.5)">🍞 Wasa</button>
+      <button class="btn btn-secondary" style="width:auto;padding:6px 12px;font-size:12px" onclick="quickFood('Yoğurt','4 kaşık',60,4,6,2)">🥛 Yoğurt</button>
+      <button class="btn btn-secondary" style="width:auto;padding:6px 12px;font-size:12px" onclick="quickFood('Muz','1 küçük',72,1,19,0)">🍌 Muz</button>
+    </div>
+
+    <button class="btn btn-primary" onclick="saveFood()" style="margin-bottom:8px">Ekle</button>
+    <button class="btn btn-secondary" onclick="closeModal('modalFood')">İptal</button>
+  </div>
+</div>
+
+<!-- Weight Modal -->
+<div class="modal-overlay" id="modalWeight">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Tartım Ekle</div>
+    <div class="inp-group">
+      <label class="inp-label">Kilo (kg)</label>
+      <input class="inp" type="number" id="weightInput" placeholder="115.0" step="0.1">
+    </div>
+    <div class="inp-group">
+      <label class="inp-label">Tarih</label>
+      <input class="inp" type="date" id="weightDate">
+    </div>
+    <div class="inp-group">
+      <label class="inp-label">Not (opsiyonel)</label>
+      <input class="inp" id="weightNote" placeholder="Sabah aç karnına...">
+    </div>
+    <button class="btn btn-primary" onclick="saveWeight()" style="margin-bottom:8px">Kaydet</button>
+    <button class="btn btn-secondary" onclick="closeModal('modalWeight')">İptal</button>
+  </div>
+</div>
+
+<!-- Body Modal -->
+<div class="modal-overlay" id="modalBody">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Vücut Ölçümü (Tanita)</div>
+    <div class="inp-row" style="margin-bottom:10px">
+      <div>
+        <label class="inp-label">Yağ Oranı %</label>
+        <input class="inp" type="number" id="bFatPct" placeholder="31.0" step="0.1">
+      </div>
+      <div>
+        <label class="inp-label">Kas Kütlesi (kg)</label>
+        <input class="inp" type="number" id="bMuscle" placeholder="69.0" step="0.1">
+      </div>
+    </div>
+    <div class="inp-row" style="margin-bottom:10px">
+      <div>
+        <label class="inp-label">BMI</label>
+        <input class="inp" type="number" id="bBmi" placeholder="33.9" step="0.1">
+      </div>
+      <div>
+        <label class="inp-label">Metabolik Yaş</label>
+        <input class="inp" type="number" id="bMetAge" placeholder="40">
+      </div>
+    </div>
+    <div class="inp-row" style="margin-bottom:16px">
+      <div>
+        <label class="inp-label">Yağ Kütlesi (kg)</label>
+        <input class="inp" type="number" id="bFatMass" placeholder="32.6" step="0.1">
+      </div>
+      <div>
+        <label class="inp-label">Protein %</label>
+        <input class="inp" type="number" id="bProteinPct" placeholder="14.9" step="0.1">
+      </div>
+    </div>
+    <button class="btn btn-primary" onclick="saveBodyMetrics()" style="margin-bottom:8px">Kaydet</button>
+    <button class="btn btn-secondary" onclick="closeModal('modalBody')">İptal</button>
+  </div>
+</div>
+
+<!-- Workout Modal -->
+<div class="modal-overlay" id="modalWorkout">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Antrenman Ekle</div>
+    <div class="inp-group">
+      <label class="inp-label">Tür</label>
+      <select class="inp" id="workoutType">
+        <option value="devre">Ev Devresi</option>
+        <option value="salon">Spor Salonu</option>
+        <option value="yuruyus">Yürüyüş</option>
+        <option value="hiit">HIIT Bisiklet</option>
+        <option value="diger">Diğer</option>
+      </select>
+    </div>
+    <div class="inp-row" style="margin-bottom:10px">
+      <div>
+        <label class="inp-label">Süre (dk)</label>
+        <input class="inp" type="number" id="workoutDuration" placeholder="45">
+      </div>
+      <div>
+        <label class="inp-label">Yakılan kcal</label>
+        <input class="inp" type="number" id="workoutKcal" placeholder="300">
+      </div>
+    </div>
+    <div class="inp-group">
+      <label class="inp-label">Not</label>
+      <input class="inp" id="workoutNote" placeholder="Bugün nasıl hissettim...">
+    </div>
+    <button class="btn btn-primary" onclick="saveWorkout()" style="margin-bottom:8px">Kaydet</button>
+    <button class="btn btn-secondary" onclick="closeModal('modalWorkout')">İptal</button>
+  </div>
+</div>
+
+<!-- Step Modal -->
+<div class="modal-overlay" id="modalStep">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Adım Güncelle</div>
+    <div class="inp-group">
+      <label class="inp-label">Bugünkü Adım Sayısı</label>
+      <input class="inp" type="number" id="stepInput" placeholder="8500">
+    </div>
+    <button class="btn btn-primary" onclick="saveSteps()" style="margin-bottom:8px">Kaydet</button>
+    <button class="btn btn-secondary" onclick="closeModal('modalStep')">İptal</button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════
+// STATE & STORAGE
+// ══════════════════════════════════════
+const GOALS = { kcal:1980, protein:175, carb:175, fat:65, steps:10000 };
+const START_WEIGHT = 115, TARGET_WEIGHT = 75;
+const TODAY = new Date().toISOString().slice(0,10);
+
+function getStore(k, def) {
+  try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : def; } catch { return def; }
+}
+function setStore(k, v) { localStorage.setItem(k, JSON.stringify(v)); }
+
+// Data keys
+const FOOD_KEY = 'cf_food_' + TODAY;
+const WEIGHT_KEY = 'cf_weights';
+const SUPP_KEY = 'cf_supp_' + TODAY;
+const WORKOUT_KEY = 'cf_workouts';
+const STEPS_KEY = 'cf_steps_' + TODAY;
+const BODY_KEY = 'cf_body';
+const START_DATE_KEY = 'cf_start_date';
+
+// Init start date
+if (!localStorage.getItem(START_DATE_KEY)) setStore(START_DATE_KEY, TODAY);
+
+// ══════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════
+function goScreen(name, el) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  if (el) el.classList.add('active');
+  if (name === 'home') refreshHome();
+  if (name === 'kilo') refreshKilo();
+  if (name === 'takviye') refreshSupp();
+}
+
+function switchMeal(name, el) {
+  document.querySelectorAll('.meal-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.mtab').forEach(t => t.classList.remove('active'));
+  document.getElementById('meal-' + name).classList.add('active');
+  el.classList.add('active');
+}
+
+// ══════════════════════════════════════
+// MODALS
+// ══════════════════════════════════════
+let currentMeal = 'sabah';
+
+function openAddFood(meal) {
+  currentMeal = meal;
+  clearFoodForm();
+  openModal('modalFood');
+}
+
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+// Close on overlay click
+document.querySelectorAll('.modal-overlay').forEach(o => {
+  o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
+});
+
+function openWeightModal() {
+  document.getElementById('weightDate').value = TODAY;
+  openModal('modalWeight');
+}
+function openWorkoutModal() { openModal('modalWorkout'); }
+function openBodyModal() { openModal('modalBody'); }
+function openStepModal() {
+  const s = getStore(STEPS_KEY, 0);
+  document.getElementById('stepInput').value = s || '';
+  openModal('modalStep');
+}
+
+// ══════════════════════════════════════
+// FOOD LOGGING
+// ══════════════════════════════════════
+function clearFoodForm() {
+  ['foodName','foodAmount','foodKcal','foodProtein','foodCarb','foodFat'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+}
+
+function quickFood(name, amount, kcal, p, c, f) {
+  document.getElementById('foodName').value = name;
+  document.getElementById('foodAmount').value = amount;
+  document.getElementById('foodKcal').value = kcal;
+  document.getElementById('foodProtein').value = p;
+  document.getElementById('foodCarb').value = c;
+  document.getElementById('foodFat').value = f;
+}
+
+function saveFood() {
+  const name = document.getElementById('foodName').value.trim();
+  const kcal = parseFloat(document.getElementById('foodKcal').value) || 0;
+  if (!name || !kcal) { showToast('Ad ve kalori zorunlu'); return; }
+  const item = {
+    id: Date.now(),
+    name,
+    amount: document.getElementById('foodAmount').value || '',
+    kcal,
+    protein: parseFloat(document.getElementById('foodProtein').value) || 0,
+    carb: parseFloat(document.getElementById('foodCarb').value) || 0,
+    fat: parseFloat(document.getElementById('foodFat').value) || 0,
+    meal: currentMeal
+  };
+  const foods = getStore(FOOD_KEY, []);
+  foods.push(item);
+  setStore(FOOD_KEY, foods);
+  closeModal('modalFood');
+  renderFoodLists();
+  refreshHome();
+  showToast('✓ Eklendi');
+}
+
+function deleteFood(id) {
+  const foods = getStore(FOOD_KEY, []).filter(f => f.id !== id);
+  setStore(FOOD_KEY, foods);
+  renderFoodLists();
+  refreshHome();
+}
+
+function renderFoodLists() {
+  const foods = getStore(FOOD_KEY, []);
+  const meals = ['sabah','ogle','ara','aksam','gece'];
+  let totalKcal = 0, totalP = 0, totalC = 0, totalF = 0;
+
+  meals.forEach(meal => {
+    const list = document.getElementById('list-' + meal);
+    const items = foods.filter(f => f.meal === meal);
+    if (!list) return;
+    if (!items.length) { list.innerHTML = '<div style="padding:8px 0;color:var(--muted2);font-size:12px">Öğün boş</div>'; return; }
+    list.innerHTML = items.map(f => `
+      <div class="food-item">
+        <div>
+          <div class="fi-name">${f.name}</div>
+          <div class="fi-detail">${f.amount} · P:${f.protein}g K:${f.carb}g Y:${f.fat}g</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="fi-kcal">${f.kcal}</div>
+          <button class="fi-del" onclick="deleteFood(${f.id})">×</button>
+        </div>
+      </div>`).join('');
+  });
+
+  foods.forEach(f => { totalKcal += f.kcal; totalP += f.protein; totalC += f.carb; totalF += f.fat; });
+
+  setText('sumKcal', Math.round(totalKcal));
+  setText('sumProtein', Math.round(totalP));
+  setText('sumCarb', Math.round(totalC));
+  setText('sumFat', Math.round(totalF));
+  setText('ogunDayKcal', `${Math.round(totalKcal)} / 1980`);
+}
+
+// ══════════════════════════════════════
+// WEIGHT
+// ══════════════════════════════════════
+function saveWeight() {
+  const kg = parseFloat(document.getElementById('weightInput').value);
+  if (!kg) { showToast('Kilo gir'); return; }
+  const date = document.getElementById('weightDate').value || TODAY;
+  const note = document.getElementById('weightNote').value;
+  const weights = getStore(WEIGHT_KEY, []);
+  const existing = weights.findIndex(w => w.date === date);
+  if (existing >= 0) weights[existing] = { date, kg, note };
+  else weights.push({ date, kg, note });
+  weights.sort((a,b) => a.date.localeCompare(b.date));
+  setStore(WEIGHT_KEY, weights);
+  closeModal('modalWeight');
+  refreshHome();
+  refreshKilo();
+  showToast('✓ Tartım kaydedildi');
+}
+
+function refreshKilo() {
+  const weights = getStore(WEIGHT_KEY, []);
+  if (!weights.length) return;
+  const latest = weights[weights.length - 1];
+  const first = weights[0];
+  setText('currentWeightDisplay', latest.kg.toFixed(1));
+
+  const diff = (latest.kg - first.kg).toFixed(1);
+  const el = document.getElementById('weightChange');
+  if (diff < 0) { el.style.color = 'var(--success)'; el.textContent = `${diff} kg (${Math.abs(diff)} kg verildi)`; }
+  else if (diff > 0) { el.style.color = 'var(--danger)'; el.textContent = `+${diff} kg`; }
+  else { el.style.color = 'var(--muted2)'; el.textContent = 'Değişim yok'; }
+
+  drawWeightChart(weights);
+}
+
+function drawWeightChart(weights) {
+  const canvas = document.getElementById('weightChart');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.parentElement.getBoundingClientRect();
+  canvas.width = (rect.width - 32) * dpr;
+  canvas.height = 140 * dpr;
+  canvas.style.width = (rect.width - 32) + 'px';
+  canvas.style.height = '140px';
+  ctx.scale(dpr, dpr);
+
+  const W = rect.width - 32, H = 140;
+  const pad = { t:16, r:8, b:24, l:40 };
+  const cw = W - pad.l - pad.r, ch = H - pad.t - pad.b;
+
+  if (weights.length < 2) {
+    ctx.fillStyle = '#555';
+    ctx.font = '12px DM Sans';
+    ctx.textAlign = 'center';
+    ctx.fillText('En az 2 tartım gerekli', W/2, H/2);
+    return;
+  }
+
+  const vals = weights.map(w => w.kg);
+  const mn = Math.min(...vals) - 2, mx = Math.max(...vals) + 2;
+  const scaleX = i => pad.l + (i / (weights.length-1)) * cw;
+  const scaleY = v => pad.t + (1 - (v-mn)/(mx-mn)) * ch;
+
+  // Grid
+  ctx.strokeStyle = '#1e1e1e';
+  ctx.lineWidth = 1;
+  for (let i=0;i<4;i++) {
+    const y = pad.t + (i/3)*ch;
+    ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(pad.l+cw, y); ctx.stroke();
+    ctx.fillStyle = '#444';
+    ctx.font = `${9 * dpr / dpr}px JetBrains Mono`;
+    ctx.textAlign = 'right';
+    ctx.fillText((mx - (mx-mn)*(i/3)).toFixed(0), pad.l-4, y+4);
+  }
+
+  // Target line
+  const ty = scaleY(TARGET_WEIGHT);
+  if (ty > pad.t && ty < pad.t+ch) {
+    ctx.strokeStyle = 'rgba(200,255,0,0.3)';
+    ctx.setLineDash([4,4]);
+    ctx.beginPath(); ctx.moveTo(pad.l, ty); ctx.lineTo(pad.l+cw, ty); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = 'var(--accent)';
+    ctx.font = '9px JetBrains Mono';
+    ctx.textAlign = 'left';
+    ctx.fillText('HEDEF 75', pad.l+4, ty-3);
+  }
+
+  // Line
+  const grad = ctx.createLinearGradient(pad.l, 0, pad.l+cw, 0);
+  grad.addColorStop(0, '#ff5c35');
+  grad.addColorStop(1, '#c8ff00');
+  ctx.strokeStyle = grad;
+  ctx.lineWidth = 2.5;
+  ctx.lineJoin = 'round';
+  ctx.beginPath();
+  weights.forEach((w,i) => {
+    const x = scaleX(i), y = scaleY(w.kg);
+    i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+
+  // Dots
+  weights.forEach((w,i) => {
+    const x = scaleX(i), y = scaleY(w.kg);
+    ctx.beginPath();
+    ctx.arc(x, y, 4, 0, Math.PI*2);
+    ctx.fillStyle = '#c8ff00';
+    ctx.fill();
+  });
+
+  // X labels (show first, last, maybe middle)
+  ctx.fillStyle = '#555';
+  ctx.font = '8px JetBrains Mono';
+  ctx.textAlign = 'center';
+  [0, Math.floor(weights.length/2), weights.length-1].forEach(i => {
+    if (weights[i]) {
+      const d = weights[i].date.slice(5);
+      ctx.fillText(d, scaleX(i), H-6);
+    }
+  });
+}
+
+// ══════════════════════════════════════
+// BODY METRICS
+// ══════════════════════════════════════
+function saveBodyMetrics() {
+  const data = {
+    date: TODAY,
+    fatPct: parseFloat(document.getElementById('bFatPct').value) || null,
+    muscle: parseFloat(document.getElementById('bMuscle').value) || null,
+    bmi: parseFloat(document.getElementById('bBmi').value) || null,
+    metAge: parseFloat(document.getElementById('bMetAge').value) || null,
+    fatMass: parseFloat(document.getElementById('bFatMass').value) || null,
+    proteinPct: parseFloat(document.getElementById('bProteinPct').value) || null,
+  };
+  const history = getStore(BODY_KEY, []);
+  history.push(data);
+  setStore(BODY_KEY, history);
+  updateBodyDisplay(data);
+  closeModal('modalBody');
+  showToast('✓ Ölçüm kaydedildi');
+}
+
+function updateBodyDisplay(data) {
+  if (data.fatPct) {
+    setText('bmFatPct', data.fatPct.toFixed(1));
+    setClass('bmFatPct', data.fatPct > 25 ? 'bm-val bad' : data.fatPct > 20 ? 'bm-val warn' : 'bm-val ok');
+  }
+  if (data.muscle) setText('bmMuscle', data.muscle.toFixed(1) + ' kg');
+  if (data.bmi) {
+    setText('bmBmi', data.bmi.toFixed(1));
+    setClass('bmBmi', data.bmi > 30 ? 'bm-val bad' : data.bmi > 25 ? 'bm-val warn' : 'bm-val ok');
+  }
+  if (data.metAge) setText('bmMetAge', data.metAge);
+  if (data.fatMass) setText('bmFatMass', data.fatMass.toFixed(1) + ' kg');
+  if (data.proteinPct) setText('bmProteinPct', data.proteinPct.toFixed(1) + '%');
+}
+
+// ══════════════════════════════════════
+// SUPPLEMENTS
+// ══════════════════════════════════════
+const SUPPS = ['d3k2','mag','omega','zinc'];
+
+function toggleSupp(id) {
+  const data = getStore(SUPP_KEY, {});
+  data[id] = !data[id];
+  setStore(SUPP_KEY, data);
+  const el = document.getElementById('supp-' + id);
+  if (el) {
+    el.classList.toggle('done', data[id]);
+  }
+  refreshSuppCount();
+  refreshHome();
+}
+
+function refreshSupp() {
+  const data = getStore(SUPP_KEY, {});
+  SUPPS.forEach(id => {
+    const el = document.getElementById('supp-' + id);
+    if (el) el.classList.toggle('done', !!data[id]);
+  });
+  refreshSuppCount();
+  renderSuppHistory();
+}
+
+function refreshSuppCount() {
+  const data = getStore(SUPP_KEY, {});
+  const done = SUPPS.filter(id => data[id]).length;
+  setText('suppTodayCount', `${done}/${SUPPS.length}`);
+}
+
+function renderSuppHistory() {
+  const el = document.getElementById('suppHistory');
+  if (!el) return;
+  const keys = Object.keys(localStorage).filter(k => k.startsWith('cf_supp_')).sort().reverse().slice(0,7);
+  if (!keys.length) { el.innerHTML = '<div style="text-align:center;color:var(--muted2);padding:16px">Kayıt yok</div>'; return; }
+  el.innerHTML = keys.map(k => {
+    const date = k.replace('cf_supp_','');
+    const data = getStore(k, {});
+    const done = SUPPS.filter(id => data[id]).length;
+    const icons = ['☀️','⚡','🐟','🛡️'];
+    const status = SUPPS.map((id,i) => `<span style="opacity:${data[id]?1:0.2}">${icons[i]}</span>`).join('');
+    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted2)">${date.slice(5)}</div>
+      <div style="display:flex;gap:4px;font-size:18px">${status}</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:${done===4?'var(--success)':'var(--muted2)'}">${done}/4</div>
+    </div>`;
+  }).join('');
+}
+
+function saveBloodTest() {
+  const val = document.getElementById('lastBloodTest').value;
+  if (val) { setStore('cf_blood_test', val); showToast('✓ Kaydedildi'); }
+}
+
+// ══════════════════════════════════════
+// WORKOUT
+// ══════════════════════════════════════
+function saveWorkout() {
+  const type = document.getElementById('workoutType').value;
+  const duration = parseInt(document.getElementById('workoutDuration').value) || 0;
+  const kcal = parseInt(document.getElementById('workoutKcal').value) || 0;
+  const note = document.getElementById('workoutNote').value;
+  if (!duration) { showToast('Süre gir'); return; }
+
+  const workouts = getStore(WORKOUT_KEY, []);
+  workouts.push({ id: Date.now(), date: TODAY, type, duration, kcal, note });
+  setStore(WORKOUT_KEY, workouts);
+  closeModal('modalWorkout');
+  renderWorkouts();
+  updateWeekGrid();
+  showToast('✓ Antrenman kaydedildi');
+}
+
+function saveWalk() {
+  const duration = parseInt(document.getElementById('walkDuration').value) || 0;
+  const distance = parseFloat(document.getElementById('walkDistance').value) || 0;
+  if (!duration) { showToast('Süre gir'); return; }
+  const kcal = Math.round(duration * 4.5); // approx
+  const workouts = getStore(WORKOUT_KEY, []);
+  workouts.push({ id: Date.now(), date: TODAY, type: 'yuruyus', duration, kcal, note: `${distance}km` });
+  setStore(WORKOUT_KEY, workouts);
+  renderWorkouts();
+  updateWeekGrid();
+  showToast(`✓ ${duration}dk yürüyüş kaydedildi`);
+}
+
+function renderWorkouts() {
+  const workouts = getStore(WORKOUT_KEY, []);
+  const today = workouts.filter(w => w.date === TODAY);
+  const el = document.getElementById('todayWorkoutList');
+  const labels = { devre:'Ev Devresi', salon:'Spor Salonu', yuruyus:'Yürüyüş', hiit:'HIIT Bisiklet', diger:'Diğer' };
+  const icons = { devre:'💪', salon:'🏋️', yuruyus:'🚶', hiit:'🚴', diger:'⚡' };
+  if (!today.length) { el.innerHTML = '<div style="text-align:center;padding:24px;color:var(--muted2);font-size:13px">Bugün antrenman yok</div>'; return; }
+  el.innerHTML = today.map(w => `
+    <div class="ex-item">
+      <div class="ex-item-header">
+        <div class="ex-item-name">${icons[w.type]||'⚡'} ${labels[w.type]||w.type}</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent)">${w.kcal} kcal</div>
+      </div>
+      <div style="font-size:12px;color:var(--muted2)">${w.duration} dk${w.note ? ' · ' + w.note : ''}</div>
+    </div>`).join('');
+
+  const recent = document.getElementById('recentWorkouts');
+  const last7 = workouts.filter(w => w.date !== TODAY).slice(-5).reverse();
+  if (!last7.length) { recent.innerHTML = '<div style="text-align:center;padding:16px;color:var(--muted2);font-size:13px">Kayıt yok</div>'; return; }
+  recent.innerHTML = last7.map(w => `
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
+      <div>
+        <div style="font-size:13px">${icons[w.type]||'⚡'} ${labels[w.type]||w.type}</div>
+        <div style="font-size:11px;color:var(--muted2)">${w.date.slice(5)} · ${w.duration}dk</div>
+      </div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent)">${w.kcal} kcal</div>
+    </div>`).join('');
+}
+
+function updateWeekGrid() {
+  const grid = document.getElementById('weekDayGrid');
+  if (!grid) return;
+  const days = ['Pt','Sa','Ça','Pe','Cu','Ct','Pz'];
+  const workouts = getStore(WORKOUT_KEY, []);
+  const now = new Date();
+  const dow = (now.getDay()+6)%7; // Mon=0
+  grid.innerHTML = Array.from({length:7},(_,i) => {
+    const d = new Date(now); d.setDate(d.getDate() - dow + i);
+    const ds = d.toISOString().slice(0,10);
+    const isToday = ds === TODAY;
+    const hasDone = workouts.some(w => w.date === ds);
+    return `<div class="wday ${isToday?'today':''} ${hasDone?'done':''}">
+      <div class="wd-name">${days[i]}</div>
+      <div class="wd-num">${d.getDate()}</div>
+      <div class="wd-dot"></div>
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════
+// STEPS
+// ══════════════════════════════════════
+function saveSteps() {
+  const s = parseInt(document.getElementById('stepInput').value) || 0;
+  setStore(STEPS_KEY, s);
+  closeModal('modalStep');
+  refreshHome();
+  showToast(`✓ ${s.toLocaleString()} adım kaydedildi`);
+}
+
+// ══════════════════════════════════════
+// HOME REFRESH
+// ══════════════════════════════════════
+function refreshHome() {
+  // Date label
+  const opts = { weekday:'long', day:'numeric', month:'long' };
+  setText('todayLabel', new Date().toLocaleDateString('tr-TR', opts));
+
+  // Foods
+  const foods = getStore(FOOD_KEY, []);
+  let totalKcal=0, totalP=0, totalC=0, totalF=0;
+  foods.forEach(f => { totalKcal+=f.kcal; totalP+=f.protein; totalC+=f.carb; totalF+=f.fat; });
+
+  setText('homeTotalKcal', Math.round(totalKcal));
+  setText('homeRemainingKcal', Math.max(0, Math.round(GOALS.kcal - totalKcal)));
+  setWidth('homeKcalBar', Math.min(100, totalKcal/GOALS.kcal*100));
+  setText('hmProtein', Math.round(totalP)+'g');
+  setText('hmCarb', Math.round(totalC)+'g');
+  setText('hmFat', Math.round(totalF)+'g');
+  setWidth('hmProteinBar', Math.min(100, totalP/GOALS.protein*100));
+  setWidth('hmCarbBar', Math.min(100, totalC/GOALS.carb*100));
+  setWidth('hmFatBar', Math.min(100, totalF/GOALS.fat*100));
+
+  // Rings
+  setRing('ringKcal', totalKcal/GOALS.kcal);
+  setText('ringKcalPct', Math.min(100,Math.round(totalKcal/GOALS.kcal*100))+'%');
+  setRing('ringProtein', totalP/GOALS.protein);
+  setText('ringProteinPct', Math.min(100,Math.round(totalP/GOALS.protein*100))+'%');
+
+  // Steps
+  const steps = getStore(STEPS_KEY, 0);
+  setText('homeSteps', steps.toLocaleString());
+  setWidth('homeStepBar', Math.min(100, steps/GOALS.steps*100));
+  setRing('ringSteps', steps/GOALS.steps);
+  setText('ringStepsPct', Math.min(100,Math.round(steps/GOALS.steps*100))+'%');
+
+  // Supps
+  const suppData = getStore(SUPP_KEY, {});
+  const suppDone = SUPPS.filter(id => suppData[id]).length;
+  setRing('ringSuppRing', suppDone/SUPPS.length);
+  setText('ringSuppPct', Math.round(suppDone/SUPPS.length*100)+'%');
+
+  // Weight & goal
+  const weights = getStore(WEIGHT_KEY, []);
+  const currentW = weights.length ? weights[weights.length-1].kg : START_WEIGHT;
+  const lost = Math.max(0, START_WEIGHT - currentW);
+  const left = Math.max(0, currentW - TARGET_WEIGHT);
+  const pct = Math.min(100, (lost/(START_WEIGHT-TARGET_WEIGHT))*100);
+  setText('homeCurrentWeight', currentW.toFixed(1));
+  setText('homeKgLeft', left.toFixed(1));
+  setText('totalLost', lost.toFixed(1)+' kg');
+  setText('totalLeft', left.toFixed(1)+' kg');
+  setText('progressPct', pct.toFixed(0)+'%');
+  setWidth('goalBar', pct);
+
+  // Week number
+  const startDate = new Date(getStore(START_DATE_KEY, TODAY));
+  const weekNum = Math.floor((new Date()-startDate)/(7*86400000)) + 1;
+  setText('homeWeekNum', weekNum);
+
+  // Faz
+  const faz = currentW >= 105 ? 0 : currentW >= 90 ? 1 : currentW >= 80 ? 2 : 3;
+  const fazLabels = ['FAZ 0','FAZ 1 — SALON','FAZ 2 — HIIT','FAZ 3 — REKOM'];
+  setText('fazBadgeHome', fazLabels[faz]);
+  setClass('fazBadgeHome', `faz-badge faz-${faz}`);
+
+  // Streaks
+  calcStreaks();
+}
+
+function calcStreaks() {
+  let dietStreak=0, workoutStreak=0, suppStreak=0;
+  const workouts = getStore(WORKOUT_KEY, []);
+  for (let i=0; i<30; i++) {
+    const d = new Date(); d.setDate(d.getDate()-i);
+    const ds = d.toISOString().slice(0,10);
+    const foods = getStore('cf_food_'+ds, []);
+    const totalKcal = foods.reduce((s,f)=>s+f.kcal,0);
+    if (totalKcal >= 1500 && totalKcal <= 2200) dietStreak++; else if(i>0) break;
+  }
+  for (let i=0; i<30; i++) {
+    const d = new Date(); d.setDate(d.getDate()-i);
+    const ds = d.toISOString().slice(0,10);
+    if (workouts.some(w=>w.date===ds)) workoutStreak++; else if(i>0) break;
+  }
+  for (let i=0; i<30; i++) {
+    const d = new Date(); d.setDate(d.getDate()-i);
+    const ds = d.toISOString().slice(0,10);
+    const sd = getStore('cf_supp_'+ds, {});
+    if (SUPPS.filter(id=>sd[id]).length >= 3) suppStreak++; else if(i>0) break;
+  }
+  setText('streakDiet', dietStreak);
+  setText('streakWorkout', workoutStreak);
+  setText('streakSupp', suppStreak);
+}
+
+// ══════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════
+function setText(id, val) { const e=document.getElementById(id); if(e) e.textContent=val; }
+function setWidth(id, pct) { const e=document.getElementById(id); if(e) e.style.width=pct+'%'; }
+function setClass(id, cls) { const e=document.getElementById(id); if(e) e.className=cls; }
+
+function setRing(id, ratio) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const r = 22, circ = 2*Math.PI*r;
+  const offset = circ * (1 - Math.min(1, ratio));
+  el.style.strokeDashoffset = offset;
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ══════════════════════════════════════
+// INIT
+// ══════════════════════════════════════
+function init() {
+  refreshHome();
+  renderFoodLists();
+  updateWeekGrid();
+  renderWorkouts();
+  refreshSupp();
+  const bt = getStore('cf_blood_test', '');
+  if (bt) document.getElementById('lastBloodTest').value = bt;
+
+  // Load latest body metrics
+  const bodyHistory = getStore(BODY_KEY, []);
+  if (bodyHistory.length) updateBodyDisplay(bodyHistory[bodyHistory.length-1]);
+}
+
+init();
+</script>
+</body>
+</html>
